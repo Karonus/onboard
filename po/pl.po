@@ -15,7 +15,7 @@ msgstr ""
 "Project-Id-Version: onboard\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-07-28 01:24+0200\n"
-"PO-Revision-Date: 2026-04-04 20:16+0200\n"
+"PO-Revision-Date: 2026-04-04 22:30+0200\n"
 "Last-Translator: Matthaiks\n"
 "Language-Team: polski <>\n"
 "Language: pl\n"
@@ -28,12 +28,12 @@ msgstr ""
 #: ../Onboard/Appearance.py:130
 #, python-brace-format
 msgid "Color scheme for theme '{filename}' not found"
-msgstr "Nie odnaleziono zestawu kolorów dla stylu „{filename}”"
+msgstr "Nie odnaleziono schematu kolorów dla motywu „{filename}”"
 
 #: ../Onboard/Appearance.py:350
 #, python-brace-format
 msgid "Error loading theme '{filename}'. {exception}: {cause}"
-msgstr "Błąd wczytywania stylu „{filename}”. {exception}: {cause}"
+msgstr "Błąd wczytywania motywu „{filename}”. {exception}: {cause}"
 
 #: ../Onboard/Appearance.py:424
 msgid "Error saving "
@@ -45,13 +45,13 @@ msgid ""
 "Loading legacy color scheme format '{old_format}', please consider upgrading "
 "to current format '{new_format}': '{filename}'"
 msgstr ""
-"Wczytywanie przestarzałego zestawu kolorów „{old_format}”. Proszę rozważyć "
-"upd do nowego formatu „{new_format}”: „{filename}”"
+"Wczytywanie przestarzałego schematu kolorów „{old_format}”. Proszę rozważyć "
+"uaktualnienie do nowego formatu „{new_format}”: „{filename}”"
 
 #: ../Onboard/Appearance.py:873
 #, python-brace-format
 msgid "Error loading color scheme '{filename}'. {exception}: {cause}"
-msgstr "Błąd wczytywania palety barw „{filename}”. {exception}: {cause}"
+msgstr "Błąd wczytywania schematu kolorów „{filename}”. {exception}: {cause}"
 
 #: ../Onboard/Appearance.py:950 ../Onboard/Appearance.py:1083
 msgid ""
@@ -67,7 +67,7 @@ msgstr "Określa nazwę lub plik układu ({})"
 
 #: ../Onboard/Config.py:246
 msgid "Theme file (.theme) or name"
-msgstr "Określa nazwę lub plik stylu (.theme)"
+msgstr "Określa nazwę lub plik motywu (.theme)"
 
 #: ../Onboard/Config.py:248
 msgid "Window size, widthxheight"
@@ -126,7 +126,7 @@ msgstr "Przenoszenie katalogu użytkownika „{}” do „{}”."
 #. python >2.5
 #: ../Onboard/Config.py:408
 msgid "failed to migrate user directory. "
-msgstr "zmiana lokalizacji katalogu użytkownika nie powiodła się. "
+msgstr "nie udało się przenieść katalogu użytkownika. "
 
 #: ../Onboard/Config.py:887
 #, python-brace-format
@@ -136,15 +136,15 @@ msgstr "układ klawiatury „{filename}” nie istnieje"
 #: ../Onboard/Config.py:928
 #, python-brace-format
 msgid "theme '{filename}' does not exist"
-msgstr "styl „{filename}” nie istnieje"
+msgstr "motyw „{filename}” nie istnieje"
 
 #: ../Onboard/Config.py:953
 msgid "Loading theme from '{}'"
-msgstr "Wczytywanie stylu z „{}”"
+msgstr "Wczytywanie motywu z „{}”"
 
 #: ../Onboard/Config.py:957
 msgid "Unable to read theme '{}'"
-msgstr "Nie można wczytać stylu „{}”"
+msgstr "Nie można wczytać motywu „{}”"
 
 #: ../Onboard/Config.py:1173
 msgid ""
@@ -166,7 +166,7 @@ msgstr ""
 #: ../Onboard/Config.py:1927
 #, python-brace-format
 msgid "color scheme '{filename}' does not exist"
-msgstr "zestaw kolorów „{filename}” nie istnieje"
+msgstr "schemat kolorów „{filename}” nie istnieje"
 
 #: ../Onboard/ConfigUtils.py:81
 msgid "gsettings schema for '{}' is not installed"
@@ -230,7 +230,8 @@ msgstr "Domyślne ustawienia: nieznany klawisz „{}” w sekcji „{}”"
 #: ../Onboard/ConfigUtils.py:656
 msgid "System defaults: Invalid enum value for key '{}' in section '{}': {}"
 msgstr ""
-"Domyślne systemowe: nieważna wartość enum dla klawisza „{}” w sekcji „{}”: {}"
+"Ustawienia domyślne: nieważna wartość enum dla klawisza „{}” w sekcji „{}”: "
+"{}"
 
 #: ../Onboard/ConfigUtils.py:669
 msgid ""
@@ -242,15 +243,15 @@ msgstr ""
 
 #: ../Onboard/ConfigUtils.py:732
 msgid "Failed to get gsettings value. "
-msgstr "Nie udało się pozyskać wartości gsettings. "
+msgstr "Nie udało się pobrać wartości gsettings. "
 
 #: ../Onboard/Indicator.py:56
 msgid "_Show Onboard"
-msgstr "_Wyświetl okno"
+msgstr "_Pokaż klawiaturę"
 
 #: ../Onboard/Indicator.py:57
 msgid "_Hide Onboard"
-msgstr "_Ukryj okno"
+msgstr "_Ukryj klawiaturę"
 
 #. Translators: label of a menu item. It used to be stock item
 #. STOCK_PREFERENCES until Gtk 3.10 deprecated those.
@@ -287,17 +288,17 @@ msgstr ""
 #. Title of the snippets dialog for existing snippets
 #: ../Onboard/KeyboardWidget.py:1651
 msgid "Edit snippet #{}"
-msgstr "Edytuj urywek nr {}"
+msgstr "Edytuj fragment nr {}"
 
 #. Title of the snippets dialog for new snippets
 #: ../Onboard/KeyboardWidget.py:1655
 msgid "New snippet"
-msgstr "Nowy urywek"
+msgstr "Nowy fragment"
 
 #. Message in the snippets dialog for new snippets
 #: ../Onboard/KeyboardWidget.py:1657
 msgid "Enter a new snippet for button #{}:"
-msgstr "Wprowadź nowy urywek dla przycisku nr {}:"
+msgstr "Wprowadź nowy fragment dla przycisku nr {}:"
 
 #. Translators: cancel button of the snippets dialog. It used to
 #. be stock item STOCK_CANCEL until Gtk 3.10 deprecated those.
@@ -309,7 +310,7 @@ msgstr "_Anuluj"
 
 #: ../Onboard/KeyboardWidget.py:1668
 msgid "_Save snippet"
-msgstr "_Zapisz urywek"
+msgstr "_Zapisz fragment"
 
 #: ../Onboard/KeyboardWidget.py:1688
 msgid "_Button label:"
@@ -317,7 +318,7 @@ msgstr "_Etykieta:"
 
 #: ../Onboard/KeyboardWidget.py:1692
 msgid "S_nippet:"
-msgstr "_Urywek:"
+msgstr "_Fragment:"
 
 #: ../Onboard/KeyboardWidget.py:1911
 msgid "Other _Languages"
@@ -393,7 +394,7 @@ msgstr "Ignorowanie klawisza „{}”. Nie określono nazwy pliku svg."
 
 #: ../Onboard/LayoutLoaderSVG.py:652
 msgid "Snippet {}"
-msgstr "Urywek {}"
+msgstr "Fragment {}"
 
 #. i18n: full string is "Snippet n, unassigned"
 #: ../Onboard/LayoutLoaderSVG.py:656
@@ -431,7 +432,7 @@ msgstr ""
 "\n"
 "Bieżąca konfiguracja systemu uniemożliwia jednak korzystanie z klawiatury "
 "ekranowej w taki sposób. Być może\n"
-"odpowiada za to inny program, który zmienił ustawienia sytemu.\n"
+"odpowiada za to inny program, który zmienił ustawienia systemu.\n"
 "\n"
 "Wyświetlać klawiaturę ekranową podczas odblokowywania ekranu?"
 
@@ -472,7 +473,7 @@ msgstr "Etykieta przycisku"
 
 #: ../Onboard/SnippetView.py:68
 msgid "Snippet Text"
-msgstr "Urywek"
+msgstr "Tekst fragmentu"
 
 #: ../Onboard/SnippetView.py:113
 msgid "Must be an integer number"
@@ -481,7 +482,7 @@ msgstr "Należy wprowadzić liczbę całkowitą"
 #: ../Onboard/SnippetView.py:122
 #, python-format
 msgid "Snippet %d is already in use."
-msgstr "Urywek %d jest już w użyciu."
+msgstr "Fragment %d jest już w użyciu."
 
 #: ../Onboard/WPEngine.py:488
 msgid "Failed to load language model '{}': {} ({})"
@@ -579,14 +580,14 @@ msgid ""
 "\n"
 "Overwrite it?"
 msgstr ""
-"Plik stylu już istnieje.\n"
+"Plik motywu już istnieje.\n"
 "„{filename}”\n"
 "\n"
 "Zastąpić go?"
 
 #: ../Onboard/settings.py:1016
 msgid "Reset selected theme to Onboard defaults?"
-msgstr "Przywrócić domyślne ustawienia stylu?"
+msgstr "Przywrócić domyślne ustawienia motywu?"
 
 #: ../Onboard/settings.py:1018
 msgid "Delete selected theme?"
@@ -817,7 +818,7 @@ msgstr "Nm&#10;Lk"
 #. translators: this is a 'tooltip' of the key_template 'layer1' in keyboard layout 'key_defs.xml'
 #: ../data/layoutstrings.py:70 ../data/layoutstrings.py:289
 msgid "Number block and snippets"
-msgstr "Wyświetla klawisze numeryczne i urywki"
+msgstr "Wyświetla klawisze numeryczne i fragmenty"
 
 #. translators: very short label of the PAUSE key
 #: ../data/layoutstrings.py:72
@@ -868,7 +869,7 @@ msgstr "Scroll"
 #. translators: this is a 'tooltip' of the key_template 'layer2' in keyboard layout 'key_defs.xml'
 #: ../data/layoutstrings.py:88 ../data/layoutstrings.py:340 ../settings.ui.h:27
 msgid "Snippets"
-msgstr "Urywki"
+msgstr "Fragmenty"
 
 #: ../data/layoutstrings.py:89
 msgid "Space"
@@ -933,7 +934,7 @@ msgstr "Znak pokoju"
 #. translators: this is a 'tooltip' of the key 'DB08' in keyboard layout 'Small.onboard'
 #: ../data/layoutstrings.py:110 ../data/layoutstrings.py:385
 msgid "Yin yang"
-msgstr "Znak Yig i yang"
+msgstr "Znak yin i yang"
 
 #. translators: description of unicode character U+2639
 #. translators: this is a 'tooltip' of the key 'DC01' in keyboard layout 'Small.onboard'
@@ -1246,7 +1247,7 @@ msgstr "Zamknij Onboard"
 #. translators: this is a 'tooltip' of the key_template 'layer2' in keyboard layout 'Whiteboard.onboard'
 #: ../data/layoutstrings.py:316
 msgid "Set and Settings"
-msgstr "Zestaw i ustawienia"
+msgstr "Ustawienia"
 
 #. translators: this is a 'tooltip' of the key 'settings' in keyboard layout 'Whiteboard_wide.onboard'
 #: ../data/layoutstrings.py:319
@@ -1765,7 +1766,7 @@ msgstr "_Usuń"
 #: ../settings.ui.h:105
 msgctxt "Label of customize theme button on preferences page Theme."
 msgid "C_ustomize theme"
-msgstr "Dostosuj _styl"
+msgstr "Dostosuj _motyw"
 
 #: ../settings.ui.h:106
 msgid "Follow _system theme"
@@ -1774,15 +1775,15 @@ msgstr "Uwzględnianie stylu _systemu"
 #: ../settings.ui.h:107
 msgid "Remember what Onboard theme was last used for every system theme."
 msgstr ""
-"Zapamiętuje wybrane style programu używane z określonym stylami systemu."
+"Zapamiętuje wybrane motywy programu używane z określonymi motywami systemu."
 
 #: ../settings.ui.h:108
 msgid ""
 "Snippets are pieces of text which are entered when the corresponding button "
 "in Onboard is pressed."
 msgstr ""
-"Urywki to fragmenty tekstu, które są wprowadzane po kliknięciu odpowiedniego "
-"przycisku klawiatury ekranowej."
+"Fragmenty to wstawki tekstowe, które są wprowadzane po kliknięciu "
+"odpowiedniego przycisku klawiatury ekranowej."
 
 #: ../settings.ui.h:109
 msgctxt "Label of add snippet button on preferences page Snippets."
@@ -1952,7 +1953,7 @@ msgid ""
 "applications."
 msgstr ""
 "Zwiększ to, jeśli kliknięcia klawiszy zostaną utracone podczas wstawiania "
-"sugestii słów lub urywków do Firefoksa lub innych aplikacji GTK2. Nie ma "
+"sugestii słów lub fragmentów do Firefoksa lub innych aplikacji GTK2. Nie ma "
 "wpływu na aplikacje GTK3."
 
 #: ../settings.ui.h:142
