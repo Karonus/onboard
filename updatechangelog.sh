@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 ENV_FILE=".env.debian.maintainer"
 EDITOR="${EDITOR:-nano}"
@@ -8,17 +8,18 @@ CHANGELOG="debian/changelog"
 DEFAULT_NAME="Uwe Niethammer"
 DEFAULT_EMAIL="[uwe@dr-niethammer.de](mailto:uwe@dr-niethammer.de)"
 
-# --- Ensure dch exists ---
+# --- Cleanup stale dch backup ---
 
-if ! command -v dch &> /dev/null; then
-sudo apt update
-sudo apt install -y devscripts
-fi
+[ -f debian/changelog.dch ] && rm debian/changelog.dch
+
+# --- Ensure tools ---
+
+command -v dch >/dev/null || sudo apt install -y devscripts
+command -v gh >/dev/null || echo "⚠️ gh not installed (no GitHub release)"
 
 # --- Create .env if missing ---
 
 if [ ! -f "$ENV_FILE" ]; then
-echo "⚠️ Creating $ENV_FILE ..."
 cat > "$ENV_FILE" <<EOF
 DEBFULLNAME="$DEFAULT_NAME"
 DEBEMAIL="$DEFAULT_EMAIL"
@@ -28,36 +29,29 @@ fi
 # --- Load env ---
 
 source "$ENV_FILE"
-export DEBFULLNAME
-export DEBEMAIL
+export DEBFULLNAME DEBEMAIL
 
 echo "🔧 Maintainer: $DEBFULLNAME <$DEBEMAIL>"
 
-# --- Ensure on main ---
+# --- Ensure main branch ---
 
-CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-echo "📍 Branch: $CURRENT_BRANCH"
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo "📍 Branch: $BRANCH"
+[ "$BRANCH" = "main" ] || { echo "❌ Run on main"; exit 1; }
 
-if [ "$CURRENT_BRANCH" != "main" ]; then
-echo "❌ Please run on main branch"
-exit 1
-fi
+# --- Determine range ---
 
-# --- Git state ---
+LAST_CHANGELOG_COMMIT=$(git log -n1 --pretty=format:%H -- "$CHANGELOG" || true)
+RAW_COMMITS=$(git log "${LAST_CHANGELOG_COMMIT}..HEAD" --pretty=format:"%s" || true)
 
-LAST_CHANGELOG_COMMIT=$(git log -n1 --pretty=format:%H -- debian/changelog)
-NEW_COMMITS=$(git rev-list --count "${LAST_CHANGELOG_COMMIT}..HEAD")
-
-# --- Collect commits ---
-
-RAW_COMMITS=$(git log "${LAST_CHANGELOG_COMMIT}..HEAD" --pretty=format:"%s")
+# --- Classify commits ---
 
 FEATURES=$(echo "$RAW_COMMITS" | grep -Ei '^(feat|feature)' || true)
 FIXES=$(echo "$RAW_COMMITS" | grep -Ei '^(fix|bug)' || true)
 INTERNAL=$(echo "$RAW_COMMITS" | grep -Ei '^(refactor|chore|cleanup)' || true)
 OTHER=$(echo "$RAW_COMMITS" | grep -Ev '^(feat|feature|fix|bug|refactor|chore|cleanup)' || true)
 
-# --- Normalize PR format (always valid Debian style) ---
+# --- Normalize PR format ---
 
 format_entries() {
 sed -E 's/^(.*)#([0-9]+).*/PR #\2 \1/'
@@ -68,12 +62,31 @@ FIXES=$(echo "$FIXES" | format_entries | sort -u)
 INTERNAL=$(echo "$INTERNAL" | format_entries | sort -u)
 OTHER=$(echo "$OTHER" | sort -u)
 
-# --- Warn if no commits ---
+# --- Extract existing entries from latest changelog block ---
 
-if [ "$NEW_COMMITS" -eq 0 ]; then
-echo "⚠️ No new commits since last changelog."
-read -p "Continue anyway? [y/N] " r
-[[ "$r" =~ ^[yY]$ ]] || exit 0
+EXISTING=$(awk '
+NR==1{next}
+NR==2{flag=1; next}
+flag && /^ -- /{exit}
+flag {gsub(/^  * /,""); print}
+' "$CHANGELOG" 2>/dev/null | sort -u)
+
+# --- Dedup function ---
+
+filter_new() {
+comm -23 <(echo "$1" | sort -u) <(echo "$EXISTING")
+}
+
+FEATURES=$(filter_new "$FEATURES")
+FIXES=$(filter_new "$FIXES")
+INTERNAL=$(filter_new "$INTERNAL")
+OTHER=$(filter_new "$OTHER")
+
+# --- Exit if nothing new ---
+
+if [ -z "${FEATURES}${FIXES}${INTERNAL}${OTHER}" ]; then
+echo "✔ No new changelog entries"
+exit 0
 fi
 
 # --- Version parsing ---
@@ -85,9 +98,6 @@ REV="${LAST_VERSION##*-}"
 IFS='.' read -r MAJOR MINOR PATCH <<< "$UPSTREAM"
 
 echo "Current: $LAST_VERSION"
-
-# --- Ask increment ---
-
 echo "[b] major  [m] minor  [p] patch  [r] revision"
 read -p "Choice [r]: " choice
 
@@ -106,6 +116,7 @@ NEW_VERSION="${NEW_BASE}-${NEW_REV}"
 echo "[u] unstable [n] next [e] experimental [r] release [x] UNRELEASED"
 read -p "Choice [x]: " dist_choice
 
+SETUP_SUFFIX=""
 case "$dist_choice" in
 [uU]) DIST="unstable"; SETUP_SUFFIX=".dev${NEW_REV}" ;;
 [nN]) DIST="next"; SETUP_SUFFIX=".dev${NEW_REV}" ;;
@@ -118,25 +129,27 @@ echo "→ Version: $NEW_VERSION ($DIST)"
 read -p "OK? [Y/n] " c
 [[ "$c" =~ ^[Nn]$ ]] && exit 1
 
-# --- Create new changelog entry ---
+# --- Create changelog entry ---
 
-echo "📝 Creating changelog..."
+DCH_DIST=$([ "$DIST" = "release" ] && echo "unstable" || echo "$DIST")
 
-dch --newversion "$NEW_VERSION" --distribution "$DIST" ""
+dch --newversion "$NEW_VERSION" \
+--distribution "$DCH_DIST" \
+--force-distribution ""
 
-# --- Build structured entries (valid format) ---
+# --- Build structured entries ---
 
-TMP_ENTRIES=$(mktemp)
+TMP=$(mktemp)
 
 add_block() {
 TITLE="$1"
 CONTENT="$2"
 if [ -n "$CONTENT" ]; then
-echo "  * [$TITLE]" >> "$TMP_ENTRIES"
-echo "$CONTENT" | while read -r line; do
-[ -n "$line" ] && echo "  * $line" >> "$TMP_ENTRIES"
+echo "  * [$TITLE]" >> "$TMP"
+echo "$CONTENT" | while read -r l; do
+[ -n "$l" ] && echo "  * $l" >> "$TMP"
 done
-echo "" >> "$TMP_ENTRIES"
+echo "" >> "$TMP"
 fi
 }
 
@@ -147,42 +160,67 @@ add_block "Other" "$OTHER"
 
 # --- Inject after header ---
 
-awk -v file="$TMP_ENTRIES" '
-NR==1 { print; next }
-NR==2 {
-while ((getline line < file) > 0) print line
-}
-{ print }
-' "$CHANGELOG" > "${CHANGELOG}.tmp" && mv "${CHANGELOG}.tmp" "$CHANGELOG"
+awk -v file="$TMP" '
+NR==1{print;next}
+NR==2{while((getline l<file)>0)print l}
+{print}
+' "$CHANGELOG" > "$CHANGELOG.tmp" && mv "$CHANGELOG.tmp" "$CHANGELOG"
 
-rm "$TMP_ENTRIES"
+rm "$TMP"
 
-# --- Validate format ---
+# --- Validate changelog ---
 
-echo "🔍 Validating changelog..."
-dpkg-parsechangelog > /dev/null
+dpkg-parsechangelog >/dev/null
 
-# --- Optional edit ---
+# --- Update setup.py version ---
 
-read -p "Edit changelog? [e/N] " e
-[[ "$e" =~ ^[eE]$ ]] && $EDITOR "$CHANGELOG"
+NEW_PY_VERSION="${NEW_BASE}${SETUP_SUFFIX}"
+echo "🐍 Python version → $NEW_PY_VERSION"
 
-# --- Update files ---
+sed -i -E "s/version *= *'[^']*'/version = '${NEW_PY_VERSION}'/" setup.py
 
-sed -i "1s/^# Onboard .*/# Onboard ${NEW_VERSION}/" README.md
-sed -i "s/version = '[^']*'/version = '${NEW_BASE}${SETUP_SUFFIX}'/" setup.py
+# --- Validate version consistency ---
+
+PY_VERSION=$(grep -E "version *= *'" setup.py | sed -E "s/.*'([^']+)'.*/\1/")
+
+if [[ "$DIST" == "release" && "$PY_VERSION" == *".dev"* ]]; then
+echo "❌ Invalid release version (.dev not allowed)"
+exit 1
+fi
 
 # --- Commit ---
 
 git add "$CHANGELOG" README.md setup.py
-
-if [ "$UPSTREAM" != "$NEW_BASE" ]; then
 git commit -m "Update version: $NEW_VERSION"
-else
-git commit -m "Update changelog revision: $NEW_VERSION"
-fi
-
 git push
 
-echo "✅ Done (clean Debian changelog, no gbp)."
+# --- Tag & GitHub Release ---
+
+if [ "$DIST" = "release" ]; then
+TAG="v$NEW_BASE"
+echo "🏷 Tagging $TAG"
+
+git tag -a "$TAG" -m "Release $NEW_VERSION"
+git push origin "$TAG"
+
+if command -v gh >/dev/null; then
+echo "🚀 Creating GitHub release..."
+
+```
+NOTES=$(awk '
+NR==1{next}
+NR==2{f=1;next}
+f && /^ -- /{exit}
+f{print}
+' "$CHANGELOG")
+
+gh release create "$TAG" \
+  --title "Onboard $NEW_BASE" \
+  --notes "$NOTES"
+```
+
+fi
+fi
+
+echo "✅ Done (no duplicates, no gbp, fully automated)."
 
